@@ -16,7 +16,10 @@ app = FastAPI(
 # Allow the Angular / React frontends to call this API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=[
+        *settings.CORS_ORIGINS,
+        "https://expense-tracker-react-project-gilt.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
