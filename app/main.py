@@ -18,7 +18,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         *settings.CORS_ORIGINS,
-        "https://expense-tracker-react-project-gilt.vercel.app",
+        "https://expense-trackegilt.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],

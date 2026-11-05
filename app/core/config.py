@@ -14,7 +14,7 @@ class Settings(BaseSettings):
         "http://127.0.0.1:4200",
         "http://localhost:5173",
         "http://127.0.0.1:5173",
-        "https://expense-tracker-react-project-gilt.vercel.app",
+        "https://expense-trackegilt.vercel.app",
     ]
 
     # Secret used to sign login tokens. Required: set a long random value in .env
