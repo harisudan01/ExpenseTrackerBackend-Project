@@ -1,0 +1,31 @@
+# PRIVATE image: same as Dockerfile, but with .env (database password, JWT secret) baked in,
+# so it runs with no extra settings (e.g. Docker Desktop's "Run" button).
+#
+#   docker build -f Dockerfile.private -t harisudan007/expense-tracker-backend-private:1.0 .
+#
+# NEVER push this to a public repository: anyone who can pull it can read the secrets.
+# Only push it to a repository set to Private on Docker Hub.
+# Uses Dockerfile.private.dockerignore (which lets .env in) instead of .dockerignore.
+
+FROM python:3.13-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+
+COPY app ./app
+COPY migrations ./migrations
+# Read by app/core/config.py from the working directory; readable only by the app user
+COPY --chown=appuser:appgroup --chmod=400 .env ./.env
+
+USER appuser
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

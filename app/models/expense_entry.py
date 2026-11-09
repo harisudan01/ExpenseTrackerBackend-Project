@@ -2,7 +2,7 @@ from datetime import date, time, datetime
 from decimal import Decimal
 
 from sqlalchemy import (
-    BigInteger, String, Text, Date, Time, DateTime, Numeric,
+    BigInteger, Integer, String, Text, Date, Time, DateTime, Numeric,
     CheckConstraint, func
 )
 from sqlalchemy.orm import Mapped, mapped_column
@@ -20,7 +20,8 @@ class ExpenseEntry(Base):
         ),
     )
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    # BIGINT in PostgreSQL; INTEGER in SQLite so ids are auto-numbered
+    id: Mapped[int] = mapped_column(BigInteger().with_variant(Integer, "sqlite"), primary_key=True)
     book_id: Mapped[int] = mapped_column(BigInteger, nullable=False, index=True)
     transaction_date: Mapped[date] = mapped_column(Date, nullable=False, index=True)
     transaction_time: Mapped[time | None] = mapped_column(Time, nullable=True)

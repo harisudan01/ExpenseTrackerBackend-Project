@@ -7,7 +7,9 @@ from app.core.config import settings
 # Create PostgreSQL engine
 engine = create_engine(
     settings.DATABASE_URL,
-    pool_pre_ping=True
+    pool_pre_ping=True,
+    # SQLite (the built-in database) is used from FastAPI's worker threads
+    connect_args={"check_same_thread": False} if settings.using_builtin_database else {},
 )
 
 

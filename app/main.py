@@ -5,8 +5,13 @@ from sqlalchemy.orm import Session
 
 
 from app.core.config import settings
-from app.database.connection import get_db
+from app.database.connection import Base, engine, get_db
 from app.api.routes import auth_router, expense_book_router, expense_entry_router
+
+# The built-in SQLite database is created from the models (the SQL files in /migrations are for PostgreSQL)
+if settings.using_builtin_database:
+    from app import models as _models  # noqa: F401  registers every table on Base
+    Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -50,5 +55,5 @@ def database_health(db: Session = Depends(get_db)):
 
     return {
         "status": "connected",
-        "database": "Supabase PostgreSQL"
+        "database": "Built-in SQLite" if settings.using_builtin_database else "PostgreSQL"
     }
