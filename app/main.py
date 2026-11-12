@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.database.connection import Base, engine, get_db
+from app.database.schema_upgrade import add_missing_columns
 from app.api.routes import auth_router, expense_book_router, expense_entry_router
 
 # The built-in SQLite database is created from the models (the SQL files in /migrations are for PostgreSQL)
@@ -13,9 +14,16 @@ if settings.using_builtin_database:
     from app import models as _models  # noqa: F401  registers every table on Base
     Base.metadata.create_all(bind=engine)
 
+# Columns added after a database was first created (both SQLite and PostgreSQL)
+add_missing_columns(engine)
+
 app = FastAPI(
     title=settings.APP_NAME,
-    version="1.0.0"
+    version="1.0.0",
+    # API docs only when explicitly enabled (ENABLE_API_DOCS=true)
+    docs_url="/docs" if settings.ENABLE_API_DOCS else None,
+    redoc_url="/redoc" if settings.ENABLE_API_DOCS else None,
+    openapi_url="/openapi.json" if settings.ENABLE_API_DOCS else None,
 )
 
 # Allow the Angular / React frontends to call this API

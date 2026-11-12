@@ -90,6 +90,5 @@ class UserResponse(BaseModel):
 
 
 class AuthResponse(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
+    # The login token itself is only sent in the HttpOnly session cookie, never in the body
     user: UserResponse

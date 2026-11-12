@@ -24,6 +24,15 @@ class UserRepository:
 
     def set_password(self, db: Session, user: User, password_hash: str):
         user.password_hash = password_hash
+        # Signs the user out everywhere: tokens issued before the reset stop working
+        user.token_version = (user.token_version or 0) + 1
+        db.commit()
+        db.refresh(user)
+        return user
+
+    def revoke_tokens(self, db: Session, user: User):
+        """Cancel every login token issued to this user so far."""
+        user.token_version = (user.token_version or 0) + 1
         db.commit()
         db.refresh(user)
         return user

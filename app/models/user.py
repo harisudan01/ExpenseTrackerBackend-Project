@@ -17,6 +17,9 @@ class User(Base):
     # Lower-cased too; NULL only for accounts created before usernames existed
     username: Mapped[str | None] = mapped_column(String(30), nullable=True, unique=True, index=True)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    # Copied into every login token. Increasing it (on logout or password reset) cancels all of
+    # the user's existing tokens, so a stolen token stops working.
+    token_version: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

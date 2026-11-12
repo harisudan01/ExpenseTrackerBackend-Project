@@ -1,6 +1,7 @@
 import logging
 import secrets
 from pathlib import Path
+from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -37,8 +38,18 @@ class Settings(BaseSettings):
     # If empty, one is generated and saved in DATA_DIR.
     JWT_SECRET_KEY: str = ""
     JWT_ALGORITHM: str = "HS256"
-    # How long a login lasts (default 7 days)
-    JWT_EXPIRE_MINUTES: int = 60 * 24 * 7
+    # How long a login lasts (default 1 day)
+    JWT_EXPIRE_MINUTES: int = 60 * 24
+
+    # ---------- session cookie ----------
+    # The login token is kept in an HttpOnly cookie, so page scripts (and any XSS) can't read it.
+    SESSION_COOKIE_NAME: str = "et_session"
+    # Send the cookie over HTTPS only. Set false only for plain-http setups other than localhost
+    # (e.g. docker compose opened from another machine); browsers allow Secure cookies on http://localhost.
+    COOKIE_SECURE: bool = True
+    # "strict": the cookie is never sent with requests started by other sites (CSRF protection).
+    # Needs the frontend and API on the same site, e.g. the API proxied under the frontend's /api.
+    COOKIE_SAMESITE: Literal["strict", "lax", "none"] = "strict"
 
     # ---------- forgot password ----------
     # Where the React app lives; the reset link in the email points here
@@ -56,6 +67,13 @@ class Settings(BaseSettings):
     # STARTTLS on port 587; set SMTP_USE_SSL=true instead for port 465
     SMTP_USE_TLS: bool = True
     SMTP_USE_SSL: bool = False
+
+    # ---------- security ----------
+    # Limit login / signup / password-reset attempts (see app/core/rate_limit.py)
+    RATE_LIMIT_ENABLED: bool = True
+    # Serve the interactive API docs at /docs, /redoc and /openapi.json.
+    # Off by default so production doesn't publish a map of the API; set true for local development.
+    ENABLE_API_DOCS: bool = False
 
     model_config = SettingsConfigDict(
         env_file=".env",

@@ -9,7 +9,6 @@ from app.core.config import settings
 from app.core.email import send_email
 from app.core.security import (
     DUMMY_HASH,
-    create_access_token,
     create_password_reset_token,
     decode_password_reset_token,
     hash_password,
@@ -31,8 +30,7 @@ class AuthService:
     def __init__(self):
         self.repository = UserRepository()
 
-    def _auth_response(self, user):
-        return {"access_token": create_access_token(user.id), "token_type": "bearer", "user": user}
+    # signup / login return the user; the route puts the login token in the session cookie
 
     def signup(self, db: Session, data: SignupRequest):
         if self.repository.get_by_email(db, data.email):
@@ -65,7 +63,7 @@ class AuthService:
                 detail="An account with this email or username already exists"
             )
 
-        return self._auth_response(user)
+        return user
 
     def login(self, db: Session, data: LoginRequest):
         user = self.repository.get_by_login(db, data.identifier)
@@ -79,7 +77,7 @@ class AuthService:
                 detail="Incorrect email/username or password"
             )
 
-        return self._auth_response(user)
+        return user
 
     def forgot_password(self, db: Session, data: ForgotPasswordRequest, background: BackgroundTasks):
         user = self.repository.get_by_login(db, data.identifier)

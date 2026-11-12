@@ -1,8 +1,0 @@
-# Used only by Dockerfile.private: same as .dockerignore but .env is allowed in
-.git
-venv
-__pycache__
-*.py[cod]
-.pytest_cache
-# Built-in SQLite database and generated JWT secret
-data/
